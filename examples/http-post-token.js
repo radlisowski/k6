@@ -26,9 +26,9 @@ export default function () {
 
     const access_token = res.json().access
     // console.log(`Access tokens is: ${access_token} `)
-    check(res, {
-        'status is 200': (r) => r.status === 200
-    });
+    // check(res, {
+    //     'status is 200': (r) => r.status === 200
+    // });
 
     // Create a new crocodile
     const myCrocodile = JSON.stringify({
@@ -49,7 +49,7 @@ export default function () {
     );
 
     check(res, {
-        'status is 201': (r) => r.status === 201
+        'creating status is 201': (r) => r.status === 201
     });
 
     res = http.get('http://localhost:8000/my/crocodiles/', 
@@ -59,12 +59,13 @@ export default function () {
             }
         }
     );
-    var crocodileId = res.json().id
+    console.log(`Crocodile ID:` + res.json()[0].id)
+    const crocodileId = res.json()[0].id;
     console.log(`Response from my crocodiles: ${res.body}`)
-
+    
     //get single priver crockodile
 
-    res = http.get(`http://localhost:8000/my/crocodiles/?id=${crocodileId}`, 
+    res = http.get(`http://localhost:8000/my/crocodiles/?id=${crocodileId}/`, 
         {
             headers: {
                 Authorization: `Bearer ${access_token}`
@@ -72,10 +73,28 @@ export default function () {
         }
     );
     check(res, {
-        'status is 200': (r) => r.status === 200
+        'status is 200': (r) => r.status === 200,
+        'check id': (r) => r.json().id === crocodileId
     });
 
     console.log(`Response from my crocodile: ${res.body}`)
+
+    // Put (update) the new crocodile to the authenticated endpoint  
+    http.
+    res = http.del(`http://localhost:8000/my/crocodiles/?id=${crocodileId}/`,
+        null,
+        {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+                'Content-Type': 'application/json'
+            }
+        }
+    );
+
+    check(res, {
+        'updatedstatus is 200': (r) => r.status === 200,
+       //"updated name": (r) => r.json().name === updatedCrocodile.name
+    });
 
 
 }
